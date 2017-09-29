@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final int HTTPS = 1;
     private static boolean mIndicator = false;
     private static final String _URL = "url";
+    private static final String TEXT_URL= "text_url";
+    private static final String TEXT_HTML= "text_html";
     private static final int ID = 0;
     private int mScheme = 0;
 
@@ -57,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         FrameLayout layout = findViewById(R.id.frame);
         mParams = (FrameLayout.LayoutParams) layout.getLayoutParams();
         if (savedInstanceState != null) {
-            mTextView.setText(savedInstanceState.getString("text1"));
-            mTextWeb.setText(savedInstanceState.getString("text2"));
+            mTextWeb.setText(savedInstanceState.getString(TEXT_URL));
+            mTextView.setText(savedInstanceState.getString(TEXT_HTML));
         }
         if (mIndicator) {
             hideShow(true);
@@ -86,8 +88,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("text1", mTextView.getText().toString());
-        outState.putString("text2", mTextWeb.getText().toString());
+        outState.putString(TEXT_URL, mTextWeb.getText().toString());
+        outState.putString(TEXT_HTML, mTextView.getText().toString());
+
     }
 
     @Override
@@ -152,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Loader loader = getSupportLoaderManager().getLoader(ID);
             if (loader != null) {
                 loader.cancelLoad();
-                Log.v("Main", "Canceled");
             }
             mTextView.setText("URL INVALID");
             mIndicator = false;
