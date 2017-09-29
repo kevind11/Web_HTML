@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mTextView = findViewById(R.id.result);
         mTextWeb = findViewById(R.id.web);
         mBar = findViewById(R.id.prog);
-
         FrameLayout layout = findViewById(R.id.frame);
         mParams = (FrameLayout.LayoutParams) layout.getLayoutParams();
         if (savedInstanceState != null) {
@@ -70,19 +69,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         setUpSpinner();
         setUpButton();
-
-
-
-    }
-
-
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-
-
     }
 
     private void setUpSpinner() {
@@ -116,30 +102,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     private void hideShow(boolean valueBar) {
@@ -163,22 +127,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-
-    }
-
-
-    @Override
     public void onLoadFinished(Loader<String> loader, String data) {
         mIndicator = false;
         hideShow(false);
         if (data != null && !data.isEmpty()) {
-
             mTextView.setText(data);
         }
-
 
     }
 
@@ -229,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();//check the connection
     }
 
-
 }
 
 class HtmlTaskLoader extends AsyncTaskLoader<String> {
@@ -272,9 +225,7 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
     @Override
     public void deliverResult(String data) {
         mResult = data;
-        Log.v("Main", "Value " + mResult);
         super.deliverResult(data);
-        Log.v("MainLoader", "Result");
     }
 
     private URL createURL(String url) throws MalformedURLException {
