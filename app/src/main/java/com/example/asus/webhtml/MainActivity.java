@@ -265,9 +265,8 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
                 line = reader.readLine();
             }
             return builder.toString();
-        } else {
-            return null;
         }
+        return null;
     }
 }
 
