@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WebHTML</string>
+    <string-array name="list">
+        <item>http://</item>
+        <item>https://</item>
+    </string-array>
+</resources>
