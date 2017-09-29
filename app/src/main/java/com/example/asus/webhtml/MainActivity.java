@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             mBar.setVisibility(View.GONE);
             mTextView.setVisibility(View.VISIBLE);
-            mParams.gravity = Gravity.LEFT;
+            mParams.gravity = Gravity.START;
         }
     }
 
