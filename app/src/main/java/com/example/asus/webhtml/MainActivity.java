@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             url = "https://" + url;
         }
         mTextWeb.setText("URL : " + url);
-        boolean valid = Patterns.WEB_URL.matcher(url).matches();
+        boolean valid = Patterns.WEB_URL.matcher(url).matches();//check if the URL is valid
         if (!valid) {
             Loader loader = getSupportLoaderManager().getLoader(ID);
             if (loader != null) {
@@ -240,7 +240,7 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
             connection.connect();
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 inputStream = connection.getInputStream();
-                result = readByteString(inputStream);
+                result = readByteToString(inputStream);
             } else {
                 return "Error Response Code " + connection.getResponseCode();
             }
@@ -253,7 +253,7 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
         return result;
     }
 
-    private String readByteString(InputStream inputStream) throws IOException {
+    private String readByteToString(InputStream inputStream) throws IOException {
         if (inputStream != null) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder builder = new StringBuilder();
