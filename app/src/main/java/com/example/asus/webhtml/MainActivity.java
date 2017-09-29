@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView mTextWeb;
     private ProgressBar mBar;
     private FrameLayout.LayoutParams mParams;
-
 
     private static final int HTTP = 0;
     private static final int HTTPS = 1;
@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (savedInstanceState != null) {
             mTextView.setText(savedInstanceState.getString("text1"));
             mTextWeb.setText(savedInstanceState.getString("text2"));
-
         }
         if (mIndicator) {
             hideShow(true);
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onSaveInstanceState(outState);
         outState.putString("text1", mTextView.getText().toString());
         outState.putString("text2", mTextWeb.getText().toString());
-
     }
 
     @Override
@@ -133,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (data != null && !data.isEmpty()) {
             mTextView.setText(data);
         }
-
     }
 
     @Override
@@ -202,11 +199,9 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
         try {
             url = createURL(mURL);
             result = openReadConnection(url);
-
-        }catch (MalformedURLException ex){
+        } catch (MalformedURLException ex) {
             return "URL INVALID";
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return "Unknown Error";
         }
@@ -230,7 +225,6 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
 
     private URL createURL(String url) throws MalformedURLException {
         URL url1 = new URL(url);
-
         return url1;
     }
 
@@ -255,7 +249,6 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
                 inputStream.close();
             }
             connection.disconnect();
-            ;
         }
         return result;
     }
