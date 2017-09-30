@@ -197,7 +197,6 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
         try {
             url = createURL(mURL);
             result = openReadConnection(url);
-
         } catch (MalformedURLException ex) {
             return "URL INVALID";
         } catch (IOException ex) {
