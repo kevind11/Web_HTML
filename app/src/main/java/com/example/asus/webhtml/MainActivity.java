@@ -31,7 +31,6 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<String>, View.OnClickListener {
     private Spinner mSpinner;
-    private ArrayAdapter<CharSequence> mAdapter;
     private Button mButton;
     private TextView mTextView;
     private EditText mEditText;
@@ -43,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final int HTTPS = 1;
     private static boolean mIndicator = false;
     private static final String _URL = "url";
-    private static final String TEXT_URL= "text_url";
-    private static final String TEXT_HTML= "text_html";
+    private static final String TEXT_URL = "text_url";
+    private static final String TEXT_HTML = "text_html";
     private static final int ID = 0;
     private int mScheme = 0;
 
@@ -52,12 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mEditText = findViewById(R.id.edit_url);
-        mTextView = findViewById(R.id.result);
-        mTextWeb = findViewById(R.id.web);
-        mBar = findViewById(R.id.prog);
-        FrameLayout layout = findViewById(R.id.frame);
-        mParams = (FrameLayout.LayoutParams) layout.getLayoutParams();
+        initView();
         if (savedInstanceState != null) {
             mTextWeb.setText(savedInstanceState.getString(TEXT_URL));
             mTextView.setText(savedInstanceState.getString(TEXT_HTML));
@@ -68,19 +62,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             hideShow(false);
         }
-        setUpSpinner();
-        setUpButton();
     }
 
-    private void setUpSpinner() {
+    private void initView() {
+        mEditText = findViewById(R.id.edit_url);
+        mTextView = findViewById(R.id.result);
+        mTextWeb = findViewById(R.id.web);
+        mBar = findViewById(R.id.prog);
+        FrameLayout layout = findViewById(R.id.frame);
+        mParams = (FrameLayout.LayoutParams) layout.getLayoutParams();
         mSpinner = findViewById(R.id.spinner);
-        mAdapter = ArrayAdapter.createFromResource(this, R.array.list, android.R.layout.simple_spinner_item);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinner.setAdapter(mAdapter);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.list, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(adapter);
         mSpinner.setOnItemSelectedListener(this);
-    }
-
-    private void setUpButton() {
         mButton = findViewById(R.id.get);
         mButton.setOnClickListener(this);
     }
@@ -90,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onSaveInstanceState(outState);
         outState.putString(TEXT_URL, mTextWeb.getText().toString());
         outState.putString(TEXT_HTML, mTextView.getText().toString());
-
     }
 
     @Override
@@ -138,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-        mTextView.setText("");
+
     }
 
     @Override
@@ -149,31 +143,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             url = "https://" + url;
         }
-        mTextWeb.setText("URL : " + url);
-        boolean valid = Patterns.WEB_URL.matcher(url).matches();//check if the URL is valid
-        if (!valid) {
-            Loader loader = getSupportLoaderManager().getLoader(ID);
-            if (loader != null) {
-                loader.cancelLoad();
-            }
-            mTextView.setText("URL INVALID");
-            mIndicator = false;
-            hideShow(false);
-        } else {
-            if (checkConnection()) {
-                Bundle bundle = new Bundle();
-                bundle.putString(_URL, url);
-                getSupportLoaderManager().restartLoader(ID, bundle, this);
-            } else {
-                Loader loader = getSupportLoaderManager().getLoader(ID);
-                if (loader != null) {
-                    loader.cancelLoad();
-                }
-                mTextView.setText("NO INTERNET CONNECTION");
-                mIndicator = false;
-                hideShow(false);
-            }
-        }
+        validateProcess(url);
+
     }
 
     private boolean checkConnection() {
@@ -182,12 +153,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();//check the connection
     }
 
+    private void cancelLoadError(String error) {
+        Loader loader = getSupportLoaderManager().getLoader(ID);
+        if (loader != null) {
+            loader.cancelLoad();
+        }
+        mTextView.setText(error);
+        mIndicator = false;
+        hideShow(false);
+    }
+
+    private void validateProcess(String url) {
+        mTextWeb.setText("URL : " + url);
+        boolean valid = Patterns.WEB_URL.matcher(url).matches();//check if the URL is valid
+        if (!valid) {
+            cancelLoadError("URL INVALID");
+        } else {
+            if (checkConnection()) {
+                Bundle bundle = new Bundle();
+                bundle.putString(_URL, url);
+                getSupportLoaderManager().restartLoader(ID, bundle, this);
+            } else {
+                cancelLoadError("NO INTERNET CONNECTION");
+            }
+        }
+    }
 }
 
 class HtmlTaskLoader extends AsyncTaskLoader<String> {
     private String mResult;
     private String mURL;
-
+    private boolean mCancel = false;
 
     public HtmlTaskLoader(Context context, String url) {
         super(context);
@@ -201,22 +197,29 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
         try {
             url = createURL(mURL);
             result = openReadConnection(url);
+
         } catch (MalformedURLException ex) {
             return "URL INVALID";
         } catch (IOException ex) {
             ex.printStackTrace();
-            return "Unknown Error";
+            return "UNKNOWN ERROR";
         }
         return result;
     }
 
     @Override
     protected void onStartLoading() {
-        if (mResult == null) {
+        if (mResult == null && !mCancel) {
             forceLoad();
         } else {
             deliverResult(mResult);
         }
+    }
+
+    @Override
+    public void onCanceled(String data) {
+        super.onCanceled(data);
+        mCancel = true;
     }
 
     @Override
@@ -244,7 +247,7 @@ class HtmlTaskLoader extends AsyncTaskLoader<String> {
                 inputStream = connection.getInputStream();
                 result = readByteToString(inputStream);
             } else {
-                return "Error Response Code " + connection.getResponseCode();
+                return "ERROR RESPONSE CODE " + connection.getResponseCode();
             }
         } finally {
             if (inputStream != null) {
