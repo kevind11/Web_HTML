@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/square"
+        android:background="@color/colorAccent"
         android:padding="8dp"
         android:text="GET PAGE SOURCE"
         android:foreground="?attr/selectableItemBackground"
