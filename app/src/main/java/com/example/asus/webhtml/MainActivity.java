@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mSpinner.setOnItemSelectedListener(this);
         mButton.setOnClickListener(this);
         mEditText.setOnEditorActionListener(this);
+        mScrollView.setOnTouchListener(this);
 
     }
 
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onClick(View view) {
-        hideSoftKeyboard(mEditText);
+        hideSoftKeyboard(view);
         String url = mEditText.getText().toString();
         if (mScheme == HTTP) {
             url = "http://" + url;
@@ -211,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        hideSoftKeyboard(mEditText);
+        hideSoftKeyboard(view);
         return false;
     }
 }
