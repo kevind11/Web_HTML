@@ -8,16 +8,20 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -29,13 +33,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<String>, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<String>, View.OnClickListener, TextView.OnEditorActionListener, View.OnTouchListener {
     private Spinner mSpinner;
     private Button mButton;
     private TextView mTextView;
     private EditText mEditText;
     private TextView mTextWeb;
     private ProgressBar mBar;
+    private ScrollView mScrollView;
     private FrameLayout.LayoutParams mParams;
 
     private static final int HTTP = 0;
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initViewListener();
         if (savedInstanceState != null) {
             mTextWeb.setText(savedInstanceState.getString(TEXT_URL));
             mTextView.setText(savedInstanceState.getString(TEXT_HTML));
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             hideShow(false);
         }
+
     }
 
     private void initView() {
@@ -69,15 +76,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mTextView = findViewById(R.id.result);
         mTextWeb = findViewById(R.id.web);
         mBar = findViewById(R.id.prog);
+        mScrollView = findViewById(R.id.scroll);
         FrameLayout layout = findViewById(R.id.frame);
         mParams = (FrameLayout.LayoutParams) layout.getLayoutParams();
         mSpinner = findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.list, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);
-        mSpinner.setOnItemSelectedListener(this);
         mButton = findViewById(R.id.get);
+        mEditText.requestFocus();
+    }
+
+    private void initViewListener() {
+        mSpinner.setOnItemSelectedListener(this);
         mButton.setOnClickListener(this);
+        mEditText.setOnEditorActionListener(this);
+
     }
 
     @Override
@@ -137,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onClick(View view) {
+        hideSoftKeyboard(mEditText);
         String url = mEditText.getText().toString();
         if (mScheme == HTTP) {
             url = "http://" + url;
@@ -177,6 +192,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 cancelLoadError("NO INTERNET CONNECTION");
             }
         }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView View, int actionId, KeyEvent keyEvent) {
+        boolean handled = false;
+        if (actionId == EditorInfo.IME_ACTION_GO) {
+            handled = true;
+            mButton.performClick();
+        }
+        return handled;
+    }
+
+    private void hideSoftKeyboard(View view) {
+        InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        hideSoftKeyboard(mEditText);
+        return false;
     }
 }
 
